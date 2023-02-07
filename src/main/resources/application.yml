@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/jpashop
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      # 자동으로 테이블 생성. Entity를 보고 테이블을 다 지운 후 새로 생성하는 방식. 당근 회사에서는 none으로..^^
+      ddl-auto: create
+    properties:
+      hibernate:
+        # sysout으로 찍는거라 권장하지 않음. (로컬에서는 괜찮다 ! 지난 로그를 볼 필요가 없으니 ,,)
+        #show_sql: true
+        format_sql: true
+    database: h2
+
+# log를 찍는것이기 때문에 운영환경에선 무조건!
+logging:
+  level:
+    # JPA나 hibernate가 생성하는 sql이 다 디버그모드로 보이게 됨
+    org.hibernate.SQL: debug
+    # 요 설정을 추가해주면 sql 파라미터에 뭐가 들어갔는지 볼 수 있다!
+    org.hibernate.type : trace
