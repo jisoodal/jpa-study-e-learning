@@ -1,6 +1,24 @@
 # jpa-study
 개인 JPA 공부
 
+# 1~4강
+1. devtools 추가 > html 파일 변경될 때마다 자동 reloading돼서 편함
+
+2. 타임리프를 통해 앞단 생성
+
+3. HelloController에서 데이터 렌더링
+
+4. src/main/resources 하위
+ - static 은 당근 정적파일 (ex 다운받아야 할 파일같은거?) 두는 곳
+ - templates에는 렌더링이 필요한 테이지를 두는 곳임 !
+ 
+ # 5~6강
+1. Entity, Repository 생성
+
+2. h2 데이터베이스를 이용하여 간단한 등록 조회 테스트
+
+3. sql 로그 출력 관련 라이브러리 설명
+ 
 # 7~9강
 1. 엔티티가 다대다 관계인 경우, 1대다 & 다대1로 풀어야 한다.
 
