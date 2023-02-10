@@ -53,9 +53,10 @@ JPA가 이런 제약을 두는 이유는 JPA 구현 라이브러리가 객체를
 4. 리플렉션이란?
 구체적인 클래스 타입을 알지 못해도 클래스의 메서드나, 타입, 변수들에 접근할 수 있도록 해주는 api
 대표적인 적용 예시로는
-1) JPA에서 객체 조회시 데이터가 들어가는 것
-2) @RequestBody 사용 시 DTO 객체에 데이터가 들어가는 것
-3) 테스트 케이스 작성시 private 메서드를 테스트할 때
+<br> <br> 1) JPA에서 객체 조회시 데이터가 들어가는 것
+<br> 2) @RequestBody 사용 시 DTO 객체에 데이터가 들어가는 것
+<br> 3) 테스트 케이스 작성시 private 메서드를 테스트할 때
+
 
 5. 하이버네이트는 내부적으로 Class.newInstance()라는 리플렉션을 이용해 해당 Entity의 기본 생성자를 호출해서 객체를 생성하게 되는데, 이 리플렉션은 생성자의 매개변수를 읽을 수가 없어서 반드시 기본 생성자를 정의해 줘야 한다.
 기본 생성자를 꼭 정의해야 하는건 아니고, RequiredArgsContructor처럼 인자가 있는 생성자를 정의했을 때만 기본 생성자를 만들어주면 된다. 
@@ -66,3 +67,75 @@ JPA가 이런 제약을 두는 이유는 JPA 구현 라이브러리가 객체를
 그 후 실제 사용 시점에 실제 엔티티 정보를 조회하여 프록시 엔티티가 원본 엔티티를 참조하도록 한다.
 그러므로 기본 생성자에 private을 사용하게 된다면 상속받은 클래스(프록시 엔티티)에서 호출이 불가능하게 되고
 public이나 protected 를 사용해야 한다는 오류가 발생하게 된다.
+
+
+# 11강
+엔티티 설계 시 주의점
+
+1. Setter는 변경포인트가 너무 많아서 유지보수가 어렵다. (값이 변경된 경우 하나하나 추적해 나가야 함)
+
+2. 모든 연관관계는 지연로딩으로 설정
+   즉시로딩은 예측이 어렵고 어떤 SQL이 실행될지 추적하기 어렵다.
+   그리고 만약에 A와 B테이블이 연관, B와 C테이블이 연관 ... ~~ 된 경우, A테이블 조회할 때 B,C, 쭉쭉 다 조회해버린다.
+   함께 조인해야 하는 경우는 fetch join 쓰면 됨!
+
+3. n+1 -> 결과의 개수만큼 쿼리를 날린다
+   예를 들어 조회 결과가 100건이면 100번 단건 쿼리를 날리는 것
+
+4. XToMany는 기본이 LAZY여서 괜찮지만
+   XToOne 관계는 기본이 즉시로딩이므로 직접 지연로딩으로 설정해야 한다. 꼭!!!!!!!!!!!!!!!!!!!
+
+
+5. 컬렉션은 필드에서 바로 초기화 하는 것이 안전하다.
+- null 문제에서도 안전하고 (초기화를 안해주면 추가적으로 유효성 체크를 해줘야 한다)
+- 하이버네이트는 엔티티를 영속화할 때 컬렉션을 감싸서 하이버네이트가 제공하는 내장 컬렉션으로 변경한다.<br><br>
+ex)
+Member member = new Member();
+<br> 1) System.out.println(member.getOrders().getClass());
+<br> // 이렇게 db에 저장하겠다 선언하면 하이버네이트가 그때부터 영속성 컨텍스트에 등록하고 관리를 한다.
+<br> // 이때 컬렉션들은 한번 감싸버린다. 왜냐면 변경에 대한 추적을 해야하기 때문!
+<br> em.persist(team);
+<br> 2) System.out.println(member.getOrders().getClass()); <br>
+<br>결과
+<br> 1) class java.util.ArrayList
+<br> 2) class org.hibernate.collection.internal.PersistentBag
+
+
+6. 엔티티 필드명, 테이블명같은 것들
+   스트링 부트 신규 설정
+<br> 1) 카멜케이스 -> 언더스코어
+<br> 2) . -> 언더스코어
+<br> 3) 대문자 -> 소문자 <br>
+<br> ** 커스텀하게 변경해서 설정할 수도 있다! (하지만 굳이,,?)
+
+
+7. CascadeType.ALL
+   persist를 전파한다.
+   delete해도 같이 지우고! <br>
+예를 들어서
+Order를 저장하기 전에 OrderItem을 저장해야 한다. <br>
+<br>그러면<br>
+<br>orderItems.persist(ItemA);
+<br>orderItems.persist(ItemB);
+<br>orderItems.persist(ItemC);
+<br>order.persist(orderA);<br>
+<br> 이런 형식이 된다.<br>
+<br> 이 때 CascadeType.ALL을 걸어주면,<br>
+<br>order.persist(orderA)만 호출해도
+<br>orderItems들을 저장하도록 한다.
+
+
+8. 양방향일 때 양쪽에 값 세팅하기 좋은 연관관계 메서드
+   엔티티에 연관관계 메서드를 정의할 수 있다.<br>
+<br>원래 같으면
+<br>Member member = new Member();
+<br>Order order = new Order();<br>
+<br>member.getOrders().add(order);
+<br>order.setMember(member);<br>
+<br>이런식으로 값을 연관지어서 넣어줬는데,<br>
+<br>// 연관관계 메서드
+<br>public void setMember(Member member) {
+<br>this.member = member;
+<br>member.getOrders().add(this);
+<br>}<br>
+<br>엔티티에 위와 같이 정의를 해주면, 매번 각각 넣어줄 필요가 없다.
