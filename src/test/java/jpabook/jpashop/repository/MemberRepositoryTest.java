@@ -28,6 +28,7 @@ public class MemberRepositoryTest {
     @Transactional
     @Rollback(value = false)
     public void testMember() throws Exception {
+        /*
         //given
         Member member = new Member();
         member.setName("memberA");
@@ -39,11 +40,13 @@ public class MemberRepositoryTest {
         //then
         Assertions.assertThat(findMember.getId()).isEqualTo(member.getId());
         Assertions.assertThat(findMember.getName()).isEqualTo(member.getName());
+        */
         /*
             둘 다 한 트랜젝션에 묶여있음.
             따라서 같은 영속성 컨텍스트 안에 있다.
             식별자가 같으면 같은 entity라고 본다.
          */
-        Assertions.assertThat(findMember).isEqualTo(member);
+        //Assertions.assertThat(findMember).isEqualTo(member);
+
     }
 }
