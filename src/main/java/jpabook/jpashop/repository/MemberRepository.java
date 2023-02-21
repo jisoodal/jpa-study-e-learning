@@ -2,8 +2,8 @@ package jpabook.jpashop.repository;
 
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import jpabook.jpashop.domain.Member;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 /*
@@ -11,14 +11,20 @@ import org.springframework.stereotype.Repository;
     컴포넌트 스캔하면서 자동으로 빈에 등록이 된다.
  */
 @Repository
+@RequiredArgsConstructor
 public class MemberRepository {
 
     /*
         spring-boot-starter-jpa 라이브러리를 추가해줬기 때문에
         @PersistenceContext가 있으면 Spring boot가 EntityManager를 주입해줌
+
+        (신규) spring boot jpa가 EntityManager에
+        @PersistenceContext 대신 @Autowired를 사용할 수 있도록 지원해준다.
+        따라서 서비스와 일관성 있게 @RequiredArgsConstructor 사용 가능!
+        spring data jpa를 쓰는게 아니면 @PersistenceContext 써야한다.
     */
-    @PersistenceContext
-    private EntityManager em;
+    // @PersistenceContext
+    private final EntityManager em;
 
     /*
         커맨드 쿼리 분리 원칙.
