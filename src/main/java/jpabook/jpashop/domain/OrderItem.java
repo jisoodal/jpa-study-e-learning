@@ -31,4 +31,21 @@ public class OrderItem {
 
     private int orderPrice;
     private int count;
+
+    public static OrderItem createOrderItem(Item item, int orderPrice, int count) {
+        // Item에 가격 정보가 있는데 굳이 인자로 받는 이유는? 할인 등등 변수가 있으니까!
+        OrderItem orderItem = new OrderItem();
+        orderItem.setItem(item);
+        orderItem.setOrderPrice(orderPrice);
+        orderItem.setCount(count);
+
+        item.removeStock(count);
+        return orderItem;
+    }
+
+    public void cancel() { getItem().addStock(count); }
+
+    public int getTotalPrice() {
+        return getOrderPrice() * getCount();
+    }
 }
