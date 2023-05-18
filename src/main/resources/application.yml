@@ -8,7 +8,7 @@ spring:
   jpa:
     hibernate:
       # 자동으로 테이블 생성. Entity를 보고 테이블을 다 지운 후 새로 생성하는 방식. 당근 회사에서는 none으로..^^
-      ddl-auto: none
+      ddl-auto: create
     properties:
       hibernate:
         # sysout으로 찍는거라 권장하지 않음. (로컬에서는 괜찮다 ! 지난 로그를 볼 필요가 없으니 ,,)
