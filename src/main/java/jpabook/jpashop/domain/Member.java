@@ -1,5 +1,6 @@
 package jpabook.jpashop.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
@@ -27,6 +28,7 @@ public class Member {
     private Address address;
 
     // 컬렉션은 필드에서 바로 초기화 하는 것이 null 문제 등에서 안전하다.
+    @JsonIgnore
     @OneToMany(mappedBy = "member")
     private List<Order> orders = new ArrayList<>();
 
