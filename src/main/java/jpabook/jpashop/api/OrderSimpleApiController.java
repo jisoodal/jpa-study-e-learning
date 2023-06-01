@@ -39,6 +39,7 @@ public class OrderSimpleApiController {
             .collect(Collectors.toList());
     }
 
+    // 재사용성 높지만, 불필요한 필드들도 조회하기 때문에 v4보다는 성능이 떨어짐
     @GetMapping("/api/v3/simple-orders")
     public List<SimpleOrderDto> ordersV3() {
         List<Order> orders = orderRepository.findAllWithMemberDelivery();
@@ -46,5 +47,11 @@ public class OrderSimpleApiController {
         return orders.stream()
             .map(SimpleOrderDto::new)
             .collect(Collectors.toList());
+    }
+
+    // 필요한 필드만 가져오기 때문에 v3보다 성능은 좋지만, 다른 api에서 재사용하기 어려움
+    @GetMapping("/api/v4/simple-orders")
+    public List<SimpleOrderDto> ordersV4() {
+        return orderRepository.findOrderDtos();
     }
 }
